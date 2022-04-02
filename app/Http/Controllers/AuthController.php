@@ -39,6 +39,12 @@ class AuthController extends Controller
         ->wherePassword($request->password)
         ->whereLevel($request->level)
         ->first();
+        if(!$isUserExist){
+            return response()->json(['message'=> 'Data yang anda masukan salah'],401);
+        }
+        if($isUserExist->verified_at==null){
+            return response()->json(['message'=> 'Akun anda belum aktif'],401);
+        }
         if($isUserExist){
             return response()->json(['data' => $isUserExist] );
         }

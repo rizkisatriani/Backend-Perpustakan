@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/register',  'AuthController@Register');
 Route::post('/login',  'AuthController@Login');
+Route::get('/getMobile',  'BukuController@getMobile');
 Route::get('/getBuku',  'BukuController@get');
 Route::post('/addBuku',  'BukuController@add');
 Route::post('/editBuku',  'BukuController@edit');
@@ -33,3 +34,8 @@ Route::get('/getDetilPeminjaman',  'PinjamController@getDetil');
 Route::post('/simpanPeminjaman',  'PinjamController@add');
 Route::post('/pengembalian',  'PinjamController@pengembalian');
 Route::post('/perpanjang',  'PinjamController@perpanjang');
+Route::post('/AccPinjam',  'PinjamController@AccPinjam');
+Route::post('/getHistoryById',  'PinjamController@getHistoryById');
+Route::post('/getById',  'PinjamController@getById');
+Route::post('/Requestpengembalian',  'PinjamController@Requestpengembalian');
+Route::post('/Requestperpanjang',  'PinjamController@Requestperpanjang');

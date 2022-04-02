@@ -16,6 +16,20 @@ class BukuController extends Controller
         return response()->json(['data' => $buku]);
     }
 
+    public function getMobile(Request $request)
+    {
+        $peminjaman= DB::table('peminjaman')
+        ->where('peminjaman.tanggal_kembali',null)
+         ->get();
+         if($peminjaman->count()>0){
+            return response()->json(['status'=>1,'data' => []]);
+         }
+       $buku= DB::table('buku')
+       ->where('judul', 'like', '%'.$request->q.'%')
+        ->get();
+        return response()->json(['status'=>0,'data' => $buku]);
+    }
+
     public function add(Request $request)
     {
         $file = $request->file('cover');
