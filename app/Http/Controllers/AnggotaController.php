@@ -16,7 +16,7 @@ class AnggotaController extends Controller
     public function index(Request $request)
     {
         $anggota= DB::table('users')
-        ->where('level', 2)
+        ->where('level', 1)
         ->where(function($q)use($request){
             $q->orWhere('name', 'like', '%'.$request->q.'%');
             $q->orWhere('no_hp', 'like', '%'.$request->q.'%');
@@ -33,6 +33,14 @@ class AnggotaController extends Controller
         ->where('level', 1)
         ->where('verified_at', NULL)
         ->get();
+        return response()->json(['data' => $anggota]);
+    }
+
+    public function AnggotaById(Request $request)
+    {
+        $anggota= DB::table('users')
+        ->where('id', $request->id)
+        ->first();
         return response()->json(['data' => $anggota]);
     }
 

@@ -44,5 +44,6 @@ Route::get('/getRequestPinjamAdmin',  'PinjamController@getRequestPinjamAdmin');
 Route::get('/getRequestKembaliAdmin',  'PinjamController@getRequestKembaliAdmin');
 Route::get('/getRequestPerpanjangAdmin',  'PinjamController@getRequestPerpanjangAdmin');
 Route::post('/getByIdPinjam',  'PinjamController@getByIdPinjam');
+Route::post('/AnggotaById',  'AnggotaController@AnggotaById');
 Route::post('/accMobile',  'PinjamController@AccMobile');
 Route::post('/TolakMobile',  'PinjamController@TolakMobile');
