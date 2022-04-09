@@ -27,6 +27,15 @@ class AnggotaController extends Controller
         return response()->json(['data' => $anggota]);
     }
 
+    public function requestAnggota(Request $request)
+    {
+        $anggota= DB::table('users')
+        ->where('level', 1)
+        ->where('verified_at', NULL)
+        ->get();
+        return response()->json(['data' => $anggota]);
+    }
+
     /**
      * Show the form for creating a new resource.
      *

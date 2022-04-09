@@ -66,9 +66,9 @@ class PinjamController extends Controller
             ->where('peminjaman.tanggal_kembali', null)
             ->orderByDesc('peminjaman.tanggal_pinjam')
             ->first();
-            if(!$peminjaman){
-                return response()->json(['status'=>1,'data' => []]);
-             }
+        if (!$peminjaman) {
+            return response()->json(['status' => 1, 'data' => []]);
+        }
         $buku = DB::table('peminjaman_buku')
             ->select('buku.*')
             ->join('buku', 'buku.id', '=', 'peminjaman_buku.buku_id')
@@ -78,6 +78,40 @@ class PinjamController extends Controller
 
         return response()->json(['peminjaman' => $peminjaman, 'data' => $buku]);
     }
+
+
+    public function getByIdPinjam(Request $request)
+    {
+        $peminjaman = DB::table('peminjaman')
+            ->select(
+                'peminjaman.id',
+                'users.name',
+                'users.nik',
+                'users.no_hp',
+                DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
+                DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
+                'peminjaman.tanggal_pinjam'
+            )
+            ->join('users', 'users.id', '=', 'peminjaman.user_id')
+            ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
+            ->where('peminjaman.id', $request->id)
+            ->where('peminjaman.tanggal_kembali', null)
+            ->orderByDesc('peminjaman.tanggal_pinjam')
+            ->first();
+        if (!$peminjaman) {
+            return response()->json(['status' => 1, 'data' => []]);
+        }
+        $buku = DB::table('peminjaman_buku')
+            ->select('buku.*')
+            ->join('buku', 'buku.id', '=', 'peminjaman_buku.buku_id')
+            ->where('peminjaman_id', $peminjaman->id)
+            ->get();
+
+
+        return response()->json(['peminjaman' => $peminjaman, 'data' => $buku]);
+    }
+
+
     public function getDetil(Request $request)
     {
         $peminjaman = DB::table('peminjaman_buku')
@@ -152,7 +186,7 @@ class PinjamController extends Controller
 
     public function Requestpengembalian(Request $request)
     {
-     DB::table('peminjaman')
+        DB::table('peminjaman')
             ->whereId($request->id)
             ->Update([
                 'tanggal_kembali' => Carbon::now(),
@@ -183,5 +217,144 @@ class PinjamController extends Controller
                 'updated_at' => Carbon::now(),
             ]);
         return response()->json(['message' => 'Peminjaman berhasil di perpanjang']);
+    }
+
+    public function getRequestPinjamAdmin(Request $request)
+    {
+        $peminjaman = DB::table('peminjaman')
+            ->select(
+                'peminjaman.id',
+                'users.name',
+                'users.nik',
+                'users.no_hp',
+                DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
+                DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
+                'peminjaman.tanggal_pinjam'
+            )
+            ->join('users', 'users.id', '=', 'peminjaman.user_id')
+            ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
+            ->where('peminjaman.peminjam_admin_id', null)
+            ->orderByDesc('peminjaman.tanggal_pinjam')
+            ->get();
+        return response()->json(['data' => $peminjaman]);
+    }
+
+    public function getRequestKembaliAdmin(Request $request)
+    {
+        $peminjaman = DB::table('peminjaman')
+            ->select(
+                'peminjaman.id',
+                'users.name',
+                'users.nik',
+                'users.no_hp',
+                DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
+                DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
+                'peminjaman.tanggal_pinjam'
+            )
+            ->join('users', 'users.id', '=', 'peminjaman.user_id')
+            ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
+            ->where('peminjaman.peminjam_admin_id', '!=', null)
+            ->where('peminjaman.pengembalian_admin_id', null)
+            ->orderByDesc('peminjaman.tanggal_pinjam')
+            ->get();
+        return response()->json(['data' => $peminjaman]);
+    }
+
+    public function getRequestPerpanjangAdmin(Request $request)
+    {
+        $peminjaman = DB::table('peminjaman')
+            ->select(
+                'peminjaman.id',
+                'users.name',
+                'users.nik',
+                'users.no_hp',
+                DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
+                DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
+                'peminjaman.tanggal_pinjam'
+            )
+            ->join('users', 'users.id', '=', 'peminjaman.user_id')
+            ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
+            ->where('peminjaman.peminjam_admin_id', '!=', null)
+            ->where('peminjaman.perpanjang_admin_id', null)
+            ->orderByDesc('peminjaman.tanggal_pinjam')
+            ->get();
+        return response()->json(['data' => $peminjaman]);
+    }
+
+    public function AccMobile(Request $request)
+    {
+        switch ($request->type) {
+            case 'pinjam':
+                DB::table('peminjaman')
+                    ->whereId($request->id)
+                    ->Update([
+                        'peminjam_admin_id' => $request->admin_id,
+                        'tanggal_pinjam' => Carbon::now(),
+                    ]);
+                break;
+            case 'kembali':
+                $peminjaman=DB::table('peminjaman')
+                ->whereId($request->id)
+                ->first();
+                $tglPinjam = new Carbon(
+                    $peminjaman->tanggal_perpanjang ?
+                        $peminjaman->tanggal_perpanjang :
+                        $peminjaman->tanggal_pinjam
+                );
+                $jmlHari = $tglPinjam->diffInDays(Carbon::now());
+                $jmlTelat = ($jmlHari - 7) > 0 ? ($jmlHari - 7) * 5000 : 0;
+                DB::table('peminjaman')
+                    ->whereId($request->id)
+                    ->Update([
+                        'pengembalian_admin_id' => $request->admin_id,
+                        'tanggal_kembali' => Carbon::now(),
+                        'denda' => $jmlTelat,
+                    ]);
+                break;
+            case 'anggota':
+                DB::table('users')
+                    ->whereId($request->id)
+                    ->Update([
+                        'verified_at' => Carbon::now(),
+                    ]);
+                break;
+            case 'perpanjang':
+                DB::table('peminjaman')
+                    ->whereId($request->id)
+                    ->Update([
+                        'perpanjang_admin_id' => $request->admin_id,
+                        'tanggal_perpanjang' => Carbon::now(),
+                    ]);
+                break;
+
+            default:
+                # code...
+                break;
+        }
+        return response()->json(['message' => 'Pengembalian berhasil.']);
+    }
+
+
+    public function TolakMobile(Request $request)
+    {
+        switch ($request->type) {
+            case 'pinjam':
+            case 'kembali':
+            case 'perpanjang':
+                DB::table('peminjaman')
+                    ->whereId($request->id)
+                    ->delete();
+                break;
+            case 'anggota':
+                DB::table('users')
+                    ->whereId($request->id)
+                    ->delete();
+                break;
+
+            default:
+                # code...
+                break;
+        }
+        return response()->json(['message' => 'Pengembalian berhasil.']);
     }
 }
