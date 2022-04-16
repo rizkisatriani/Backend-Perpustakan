@@ -16,7 +16,6 @@ class AnggotaController extends Controller
     public function index(Request $request)
     {
         $anggota= DB::table('users')
-        ->where('level', 1)
         ->where(function($q)use($request){
             $q->orWhere('name', 'like', '%'.$request->q.'%');
             $q->orWhere('no_hp', 'like', '%'.$request->q.'%');
@@ -56,7 +55,7 @@ class AnggotaController extends Controller
             'email' => $request->email,
             'no_hp' => $request->no_hp,
             'nik' => $request->nik,
-            'level' => 2,
+            'level' => $request->level,
             'password' => $request->nik,
             'verified_at' => Carbon::now(),
             'created_at' => Carbon::now(),

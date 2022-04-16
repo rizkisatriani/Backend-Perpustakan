@@ -275,6 +275,7 @@ class PinjamController extends Controller
             ->join('users', 'users.id', '=', 'peminjaman.user_id')
             ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
             ->where('peminjaman.peminjam_admin_id', '!=', null)
+            ->where('peminjaman.pengembalian_admin_id', null)
             ->where('peminjaman.perpanjang_admin_id', null)
             ->orderByDesc('peminjaman.tanggal_pinjam')
             ->get();
