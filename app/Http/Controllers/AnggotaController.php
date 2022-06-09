@@ -56,6 +56,7 @@ class AnggotaController extends Controller
             'no_hp' => $request->no_hp,
             'nik' => $request->nik,
             'level' => $request->level,
+            'avatar' => '/avatar/default.png',
             'password' => $request->nik,
             'verified_at' => Carbon::now(),
             'created_at' => Carbon::now(),
@@ -118,6 +119,19 @@ class AnggotaController extends Controller
         return response()->json(['message' => 'Anggota berhasil di edit']);
     }
 
+    public function changeAvatar(Request $request)
+    {
+        $file = $request->file('avatar');
+        $tujuan_upload = 'avatar';
+        $file->move($tujuan_upload,$request->id);
+        DB::table('users')
+        ->where('id', $request->id)
+        ->update([
+            'avatar' => '/avatar/'.$request->id,
+        ]);
+        return response()->json(['message' => 'Avatar berhasil di edit',
+                                 'url' => '/avatar/'.$request->id]);
+    }
     /**
      * Remove the specified resource from storage.
      *

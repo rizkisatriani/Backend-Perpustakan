@@ -37,12 +37,13 @@ class PinjamController extends Controller
                 'users.no_hp',
                 DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
                 DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
-                'peminjaman.tanggal_pinjam'
+                'peminjaman.tanggal_pinjam',
+                'peminjaman.tanggal_kembali',
+                'peminjaman.tanggal_perpanjang'
             )
             ->join('users', 'users.id', '=', 'peminjaman.user_id')
             ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
             ->where('users.nik', $request->nik)
-            ->where('peminjaman.tanggal_kembali', null)
             ->orderByDesc('peminjaman.tanggal_pinjam')
             ->get();
         return response()->json(['data' => $peminjaman]);
