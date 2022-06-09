@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/register',  'AuthController@Register');
 Route::post('/login',  'AuthController@Login');
-Route::get('/getMobile',  'BukuController@getMobile');
+Route::post('/getMobile',  'BukuController@getMobile');
 Route::get('/getBuku',  'BukuController@get');
 Route::post('/addBuku',  'BukuController@add');
 Route::post('/editBuku',  'BukuController@edit');

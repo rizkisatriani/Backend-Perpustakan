@@ -37,7 +37,6 @@ class AuthController extends Controller
         $isUserExist=DB::table('users')
         ->whereNik($request->nik)
         ->wherePassword($request->password)
-        ->whereLevel($request->level)
         ->first();
         if(!$isUserExist){
             return response()->json(['message'=> 'Data yang anda masukan salah'],401);

@@ -20,7 +20,9 @@ class BukuController extends Controller
     {
         $peminjaman= DB::table('peminjaman')
         ->where('peminjaman.tanggal_kembali',null)
+        ->where('peminjaman.user_id',$request->user_id)
          ->get();
+        //  return response()->json(['status'=>1,'data' =>[],'isi'=> $request->user_id]);
          if($peminjaman->count()>0){
             return response()->json(['status'=>1,'data' => []]);
          }

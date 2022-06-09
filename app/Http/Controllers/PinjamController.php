@@ -63,7 +63,14 @@ class PinjamController extends Controller
             ->join('users', 'users.id', '=', 'peminjaman.user_id')
             ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
             ->where('users.nik', $request->nik)
+            ->where('peminjaman.peminjam_admin_id','!=', null)
             ->where('peminjaman.tanggal_kembali', null)
+            ->Where('peminjaman.tanggal_perpanjang', null)
+            ->orWhere(function($q) {
+                $q->where('peminjaman.tanggal_perpanjang','!=', null)
+                  ->Where('peminjaman.perpanjang_admin_id','!=', null)
+                  ->Where('peminjaman.tanggal_kembali', null);
+            })
             ->orderByDesc('peminjaman.tanggal_pinjam')
             ->first();
         if (!$peminjaman) {
@@ -95,7 +102,6 @@ class PinjamController extends Controller
             ->join('users', 'users.id', '=', 'peminjaman.user_id')
             ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
             ->where('peminjaman.id', $request->id)
-            ->where('peminjaman.tanggal_kembali', null)
             ->orderByDesc('peminjaman.tanggal_pinjam')
             ->first();
         if (!$peminjaman) {
@@ -214,6 +220,7 @@ class PinjamController extends Controller
             ->whereId($request->id)
             ->Update([
                 'tanggal_perpanjang' => Carbon::now()->addDays(7),
+                'perpanjang_admin_id' => null,
                 'updated_at' => Carbon::now(),
             ]);
         return response()->json(['message' => 'Peminjaman berhasil di perpanjang']);
@@ -255,6 +262,7 @@ class PinjamController extends Controller
             ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
             ->where('peminjaman.peminjam_admin_id', '!=', null)
             ->where('peminjaman.pengembalian_admin_id', null)
+            ->where('peminjaman.tanggal_kembali', '!=', null)
             ->orderByDesc('peminjaman.tanggal_pinjam')
             ->get();
         return response()->json(['data' => $peminjaman]);
@@ -340,12 +348,24 @@ class PinjamController extends Controller
     {
         switch ($request->type) {
             case 'pinjam':
-            case 'kembali':
-            case 'perpanjang':
                 DB::table('peminjaman')
                     ->whereId($request->id)
                     ->delete();
                 break;
+                case 'kembali':
+                    DB::table('peminjaman')
+                        ->whereId($request->id)
+                        ->update([
+                            'tanggal_kembali'=>null,
+                        ]);
+                    break;
+                    case 'perpanjang':
+                        DB::table('peminjaman')
+                            ->whereId($request->id)
+                            ->update([
+                                'tanggal_perpanjang'=>null,
+                            ]);
+                        break;
             case 'anggota':
                 DB::table('users')
                     ->whereId($request->id)
@@ -356,6 +376,6 @@ class PinjamController extends Controller
                 # code...
                 break;
         }
-        return response()->json(['message' => 'Pengembalian berhasil.']);
+        return response()->json(['message' => 'Proses penolakan berhasil.']);
     }
 }
