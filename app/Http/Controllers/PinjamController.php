@@ -10,20 +10,111 @@ class PinjamController extends Controller
 {
     public function get(Request $request)
     {
-        $peminjaman = DB::table('peminjaman')
-            ->select(
-                'peminjaman.id',
-                'users.name',
-                'users.nik',
-                'users.no_hp',
-                DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
-                DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
-                'peminjaman.tanggal_pinjam'
-            )
-            ->join('users', 'users.id', '=', 'peminjaman.user_id')
-            ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
-            ->where('peminjaman.tanggal_kembali', null)
-            ->get();
+        if($request->id){
+            $peminjaman = DB::table('peminjaman')
+                ->select(
+                    'peminjaman.id',
+                    'users.name',
+                    'users.nik',
+                    'users.no_hp',
+                    DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
+                    DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
+                    DB::raw('IFNULL(peminjaman.peminjam_admin_id,"-") as peminjaman'),
+                    DB::raw('IFNULL(peminjaman.pengembalian_admin_id,"-") as pengembalian'),
+                    DB::raw('IFNULL(peminjaman.perpanjang_admin_id,"-") as perpanjang'),
+                    'peminjaman.tanggal_pinjam'
+                )
+                ->join('users', 'users.id', '=', 'peminjaman.user_id')
+                ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
+                ->where('peminjaman.user_id', $request->id)
+                ->where('peminjaman.tanggal_kembali', null)
+                ->get();
+        }else if($request->isKembali){
+            if($request->isAdmin==="true"){
+                $peminjaman = DB::table('peminjaman')
+                    ->select(
+                        'peminjaman.id',
+                        'users.name',
+                        'users.nik',
+                        'users.no_hp',
+                        DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
+                        DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
+                        'peminjaman.tanggal_pinjam'
+                    )
+                    ->join('users', 'users.id', '=', 'peminjaman.user_id')
+                    ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
+                    ->where('peminjaman.peminjam_admin_id','!=', null)
+                    ->where('peminjaman.pengembalian_admin_id', null)
+                    ->get();
+            }else{
+                $peminjaman = DB::table('peminjaman')
+                    ->select(
+                        'peminjaman.id',
+                        'users.name',
+                        'users.nik',
+                        'users.no_hp',
+                        DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
+                        DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
+                        'peminjaman.tanggal_pinjam'
+                    )
+                    ->join('users', 'users.id', '=', 'peminjaman.user_id')
+                    ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
+                    ->where('peminjaman.peminjam_admin_id','!=', null)
+                    ->where('peminjaman.tanggal_kembali', null)
+                    ->get();
+            }
+        }else if($request->isPerpanjang){
+            if($request->isAdmin==="true"){
+                $peminjaman = DB::table('peminjaman')
+                    ->select(
+                        'peminjaman.id',
+                        'users.name',
+                        'users.nik',
+                        'users.no_hp',
+                        DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
+                        DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
+                        'peminjaman.tanggal_pinjam'
+                    )
+                    ->join('users', 'users.id', '=', 'peminjaman.user_id')
+                    ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
+                    ->where('peminjaman.peminjam_admin_id','!=', null)
+                    ->where('peminjaman.perpanjang_admin_id', null)
+                    ->where('peminjaman.tanggal_kembali', null)
+                    ->get();
+            }else{
+                $peminjaman = DB::table('peminjaman')
+                    ->select(
+                        'peminjaman.id',
+                        'users.name',
+                        'users.nik',
+                        'users.no_hp',
+                        DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
+                        DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
+                        'peminjaman.tanggal_pinjam'
+                    )
+                    ->join('users', 'users.id', '=', 'peminjaman.user_id')
+                    ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
+                    ->where('peminjaman.peminjam_admin_id','!=', null)
+                    ->where('peminjaman.tanggal_perpanjang', null)
+                    ->where('peminjaman.tanggal_kembali', null)
+                    ->get();
+            }
+        }else{
+            $peminjaman = DB::table('peminjaman')
+                ->select(
+                    'peminjaman.id',
+                    'users.name',
+                    'users.nik',
+                    'users.no_hp',
+                    DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
+                    DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
+                    'peminjaman.tanggal_pinjam'
+                )
+                ->join('users', 'users.id', '=', 'peminjaman.user_id')
+                ->Leftjoin(DB::raw('users as peminjam'), DB::raw('peminjam.id'), '=', 'peminjaman.peminjam_admin_id')
+                ->where('peminjaman.tanggal_kembali', null)
+                ->get();
+        }
         return response()->json(['data' => $peminjaman]);
     }
 
@@ -183,7 +274,7 @@ class PinjamController extends Controller
         $peminjam = DB::table('peminjaman')
             ->whereId($request->id)
             ->Update([
-                'pengembalian_admin_id' => $request->admin,
+                'pengembalian_admin_id' => $request->admin?$request->admin:null,
                 'tanggal_kembali' => Carbon::now(),
                 'denda' => $request->denda,
                 'updated_at' => Carbon::now(),
