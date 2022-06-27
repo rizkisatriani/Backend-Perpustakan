@@ -460,8 +460,13 @@ class PinjamController extends Controller
                         break;
             case 'anggota':
                 DB::table('users')
-                    ->whereId($request->id)
-                    ->delete();
+                            ->whereId($request->id)
+                            ->update([
+                                'status'=>0,
+                            ]);
+                // DB::table('users')
+                //     ->whereId($request->id)
+                //     ->delete();
                 break;
 
             default:
