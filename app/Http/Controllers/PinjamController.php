@@ -150,6 +150,8 @@ class PinjamController extends Controller
                 'users.no_hp',
                 DB::raw('IFNULL(peminjam.name,"-") as peminjam_name'),
                 DB::raw('IFNULL(peminjam.nik,"-") as peminjam_nik'),
+                'peminjaman.tanggal_pinjam',
+                'peminjaman.tanggal_perpanjang',
                 'peminjaman.tanggal_pinjam'
             )
             ->join('users', 'users.id', '=', 'peminjaman.user_id')
@@ -174,8 +176,15 @@ class PinjamController extends Controller
             ->where('peminjaman_id', $peminjaman->id)
             ->get();
 
+            $tglPinjam = new Carbon(
+                $peminjaman->tanggal_perpanjang ?
+                    $peminjaman->tanggal_perpanjang :
+                    $peminjaman->tanggal_pinjam
+            );
+            $jmlHari = $tglPinjam->diffInDays(Carbon::now());
+            $jmlTelat = ($jmlHari - 7) > 0 ? ($jmlHari - 7) * 5000 : 0;
 
-        return response()->json(['peminjaman' => $peminjaman, 'data' => $buku]);
+        return response()->json(['peminjaman' => $peminjaman, 'denda' => $jmlTelat, 'data' => $buku]);
     }
 
 
