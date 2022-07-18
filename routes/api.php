@@ -48,3 +48,6 @@ Route::post('/AnggotaById',  'AnggotaController@AnggotaById');
 Route::post('/accMobile',  'PinjamController@AccMobile');
 Route::post('/TolakMobile',  'PinjamController@TolakMobile');
 Route::post('/changeAvatar',  'AnggotaController@changeAvatar');
+Route::post('/request',  'RequestBuku@create');
+Route::get('/getrequest',  'RequestBuku@index');
+Route::post('/deleterequest',  'RequestBuku@destroy');
